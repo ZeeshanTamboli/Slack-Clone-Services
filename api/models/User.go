@@ -19,7 +19,6 @@ type User struct {
 func (u *User) Prepare() {
 	u.ID = 0
 	u.Email = html.EscapeString(strings.TrimSpace(u.Email))
-	// u.Workspaces =
 	u.CreatedAt = time.Now()
 	u.UpdatedAt = time.Now()
 }
