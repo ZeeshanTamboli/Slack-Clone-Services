@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 
-	// This import is needed to register postgres database
+	// This import is needed to register postgres database - Don't remove the "underscore"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
