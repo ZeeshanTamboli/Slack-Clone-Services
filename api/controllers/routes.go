@@ -7,5 +7,5 @@ import (
 // InitializeRoutes : Initialize all the endpoints
 func (s *Server) InitializeRoutes() {
 	// User routes
-	s.Router.HandleFunc("/user/createWorkspace", middlewares.SetMiddlewareJSON(s.CreateWorkspace)).Methods("POST")
+	s.Router.HandleFunc("/api/user/createWorkspace", middlewares.SetMiddlewareJSON(s.CreateWorkspace)).Methods("POST")
 }
