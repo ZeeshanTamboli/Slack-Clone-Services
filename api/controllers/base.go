@@ -24,6 +24,7 @@ func (server *Server) Initialize(DbDriver, DbUser, DbPassword, DbPort, DbHost, D
 	if DbDriver == "postgres" {
 		DBURL := fmt.Sprintf("host=%v port=%v user=%v dbname=%v sslmode=disable password=%v\n", DbHost, DbPort, DbUser, DbName, DbPassword)
 		server.DB, err = gorm.Open(DbDriver, DBURL)
+		server.DB.LogMode(true)
 
 		if err != nil {
 			fmt.Printf("Cannot connect to %v database\n", DbDriver)
