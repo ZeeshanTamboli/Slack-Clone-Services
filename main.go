@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/ZeeshanTamboli/slack-clone-services/api/handlers"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -22,11 +21,11 @@ const (
 	dbname = "DBNAME"
 )
 
-func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Env files could not be loaded")
-	}
-}
+// func init() {
+// 	if err := godotenv.Load(); err != nil {
+// 		log.Fatal("Env files could not be loaded")
+// 	}
+// }
 
 func main() {
 	initDb()
