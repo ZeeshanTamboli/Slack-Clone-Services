@@ -4,12 +4,12 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
+
+	"github.com/ZeeshanTamboli/slack-clone-services/api/handlers"
 
 	"github.com/joho/godotenv"
 
-	"github.com/ZeeshanTamboli/slack-clone-services/api/handlers"
 	_ "github.com/lib/pq"
 )
 
@@ -24,18 +24,15 @@ const (
 )
 
 func init() {
-	if err := godotenv.Load; err != nil {
-		log.Fatal("Env files could not be loaded")
+	if err := godotenv.Load(); err != nil {
+		log.Println("Env files could not be loaded. Err: ", err)
 	}
 }
 
 func main() {
 	initDb()
 	defer db.Close() // This will close the db if the server fails to start and exits this main func
-	addr := ":8080"
-	handlers.Endpoints()
-	log.Println("listen on", addr)
-	log.Fatal(http.ListenAndServe(addr, nil))
+	handlers.InitializeRoutes()
 }
 
 func initDb() {

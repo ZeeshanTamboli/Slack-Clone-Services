@@ -6,5 +6,5 @@ import (
 )
 
 func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Here")
+	fmt.Println("asd")
 }
