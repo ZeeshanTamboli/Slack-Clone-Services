@@ -8,6 +8,8 @@ import (
 	"os"
 
 	"github.com/ZeeshanTamboli/slack-clone-services/api/handlers"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 var db *sql.DB
@@ -21,7 +23,9 @@ const (
 )
 
 func init() {
-	if err := godotenv.
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Env files could not be loaded")
+	}
 }
 
 func main() {
