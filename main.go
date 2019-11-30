@@ -6,14 +6,14 @@ import (
 	"log"
 	"os"
 
+	"github.com/ZeeshanTamboli/slack-clone-services/database"
+
 	"github.com/ZeeshanTamboli/slack-clone-services/api/handlers"
 
 	"github.com/joho/godotenv"
 
 	_ "github.com/lib/pq"
 )
-
-var db *sql.DB
 
 const (
 	dbhost = "DBHOST"
@@ -31,7 +31,7 @@ func init() {
 
 func main() {
 	initDb()
-	defer db.Close() // This will close the db if the server fails to start and exits this main func
+	defer database.DBCon.Close() // This will close the db if the server fails to start and exits this main func
 	handlers.InitializeRoutes()
 }
 
@@ -40,12 +40,12 @@ func initDb() {
 	var err error
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+"password=%s dbname=%s sslmode=disable", config[dbhost], config[dbport], config[dbuser], config[dbpass], config[dbname])
 
-	db, err = sql.Open("postgres", psqlInfo)
+	database.DBCon, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
 	}
 
-	err = db.Ping()
+	err = database.DBCon.Ping()
 	if err != nil {
 		panic(err)
 	}
