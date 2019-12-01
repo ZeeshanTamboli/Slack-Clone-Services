@@ -16,9 +16,16 @@ type Request struct {
 	Workspace string `json:"workspace"`
 }
 
+// Response : Signup response struct
+type Response struct {
+	Success bool `json:"success"`
+}
+
 func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
 	request := Request{}
+	response := Response{}
 	var numOfRowsInserted int64
+
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		panic(err)
@@ -45,11 +52,20 @@ func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
 	usersAndworkspacesRes, err := database.DBCon.Exec(`insert into users_workspaces (user_id, workspace_id) values ($1, $2)`, userID, workspaceID)
 	if err != nil {
 		panic(err)
-
 	}
 	numOfRowsInserted, err = usersAndworkspacesRes.RowsAffected()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Number of rows inserted in 'users_workspaces' table : %v \n", numOfRowsInserted)
+
+	response.Success = true
+	responseJSON, err := json.Marshal(response)
+	if err != nil {
+		panic(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(responseJSON)
 }
