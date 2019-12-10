@@ -18,7 +18,8 @@ type Request struct {
 
 // Response : Signup response struct
 type Response struct {
-	Success bool `json:"success"`
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
 }
 
 func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
@@ -36,14 +37,8 @@ func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
 	database.DBCon.QueryRow(`select owner_id from workspaces where name=$1`, request.Workspace).Scan((&ownerID))
 	if ownerID != 0 {
 		response.Success = false
-		responseJSON, err := json.Marshal(response)
-		if err != nil {
-			panic(err)
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(responseJSON)
+		response.Error = "Existing workspace"
+		jsonResponse(w, http.StatusConflict, response)
 		return
 	}
 
@@ -76,12 +71,5 @@ func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Number of rows inserted in 'users_workspaces' table : %v \n", numOfRowsInserted)
 
 	response.Success = true
-	responseJSON, err := json.Marshal(response)
-	if err != nil {
-		panic(err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(responseJSON)
+	jsonResponse(w, http.StatusOK, response)
 }
