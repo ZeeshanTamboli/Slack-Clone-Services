@@ -17,7 +17,7 @@ update_update_at_column();
 
 
 /* Creating Workspaces table */
-create table workspaces(id serial primary key, name varchar(100) unique, created_at timestamptz default now(), updated_at timestamptz default now());
+create table workspaces(id serial primary key, name varchar(100) unique, foreign key(owner_id) references users(id), created_at timestamptz default now(), updated_at timestamptz default now());
 
 /* Update timestamp when row is updated in PostgreSQL */
 CREATE OR REPLACE FUNCTION update_update_at_column()

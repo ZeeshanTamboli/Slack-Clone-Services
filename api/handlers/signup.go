@@ -21,7 +21,8 @@ type Request struct {
 
 // Response : Signup response struct
 type Response struct {
-	Success bool `json:"success"`
+	Success bool   `json:"success"`
+	Error   string `json:"error"`
 }
 
 func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
@@ -35,8 +36,16 @@ func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if there is a owner for the workspace
+	var ownerID int
+	database.DBCon.QueryRow(`select owner_id from workspaces where name=$1`, request.Workspace).Scan((&ownerID))
+	if ownerID != 0 {
+		responses.ERROR(w, http.StatusConflict, errors.New("Workspace already exists"))
+		return
+	}
+
 	var userID int
-	err = database.DBCon.QueryRow(`select id from users where email=$1`, request.Email).Scan(&userID)
+	database.DBCon.QueryRow(`select id from users where email=$1`, request.Email).Scan(&userID)
 	if userID == 0 {
 		err = database.DBCon.QueryRow(`insert into users (first_name, last_name, email) values ($1, $2, $3) returning id`, request.FirstName, request.LastName, request.Email).Scan(&userID)
 		if err != nil {
@@ -46,9 +55,9 @@ func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var workspaceID int
-	err = database.DBCon.QueryRow(`select id from workspaces where name=$1`, request.Workspace).Scan(&workspaceID)
+	database.DBCon.QueryRow(`select id from workspaces where name=$1`, request.Workspace).Scan(&workspaceID)
 	if workspaceID == 0 {
-		err = database.DBCon.QueryRow(`insert into workspaces (name) values ($1) returning id`, request.Workspace).Scan(&workspaceID)
+		err = database.DBCon.QueryRow(`insert into workspaces (name, owner_id) values ($1, $2) returning id`, request.Workspace, userID).Scan(&workspaceID)
 		if err != nil {
 			responses.ERROR(w, http.StatusConflict, errors.New("Cannot insert workspace data"))
 			return
