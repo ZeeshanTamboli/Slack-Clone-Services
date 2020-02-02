@@ -12,7 +12,7 @@ import (
 )
 
 // Request : Signup request struct
-type Request struct {
+type signupRequest struct {
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
 	Email     string `json:"email"`
@@ -20,14 +20,14 @@ type Request struct {
 }
 
 // Response : Signup response struct
-type Response struct {
+type signupResponse struct {
 	Success bool   `json:"success"`
 	Error   string `json:"error"`
 }
 
 func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
-	request := Request{}
-	response := Response{}
+	request := signupRequest{}
+	response := signupResponse{}
 	var numOfRowsInserted int64
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -71,7 +71,7 @@ func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	numOfRowsInserted, err = usersAndworkspacesRes.RowsAffected()
 	if err != nil {
-		responses.ERROR(w, http.StatusConflict, errors.New("Rows affected throwed an error"))
+		responses.ERROR(w, http.StatusConflict, errors.New("RowsAffected throwed an error"))
 		return
 	}
 	fmt.Printf("Number of rows inserted in 'users_workspaces' table : %v \n", numOfRowsInserted)
