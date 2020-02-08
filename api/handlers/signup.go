@@ -21,8 +21,7 @@ type signupRequest struct {
 
 // Response : Signup response struct
 type signupResponse struct {
-	Success bool   `json:"success"`
-	Error   string `json:"error"`
+	Success bool `json:"success"`
 }
 
 func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +31,7 @@ func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, errors.New("Cannot decode request JSON"))
+		responses.ERROR(w, http.StatusUnprocessableEntity, errors.New("CANNOT_DECODE_JSON"))
 		return
 	}
 
@@ -40,7 +39,7 @@ func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
 	var ownerID int
 	database.DBCon.QueryRow(`select owner_id from workspaces where name=$1`, request.Workspace).Scan((&ownerID))
 	if ownerID != 0 {
-		responses.ERROR(w, http.StatusConflict, errors.New("Workspace already exists"))
+		responses.ERROR(w, http.StatusConflict, errors.New("WORKSPACE_ALREADY_EXISTS"))
 		return
 	}
 
@@ -49,7 +48,7 @@ func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
 	if userID == 0 {
 		err = database.DBCon.QueryRow(`insert into users (first_name, last_name, email) values ($1, $2, $3) returning id`, request.FirstName, request.LastName, request.Email).Scan(&userID)
 		if err != nil {
-			responses.ERROR(w, http.StatusConflict, errors.New("Cannot insert user data"))
+			responses.ERROR(w, http.StatusConflict, errors.New("CANNOT_CREATE_USER"))
 			return
 		}
 	}
@@ -59,19 +58,19 @@ func createUserAndWorkspaceHandler(w http.ResponseWriter, r *http.Request) {
 	if workspaceID == 0 {
 		err = database.DBCon.QueryRow(`insert into workspaces (name, owner_id) values ($1, $2) returning id`, request.Workspace, userID).Scan(&workspaceID)
 		if err != nil {
-			responses.ERROR(w, http.StatusConflict, errors.New("Cannot insert workspace data"))
+			responses.ERROR(w, http.StatusConflict, errors.New("CANNOT_CREATE_WORKSPACE"))
 			return
 		}
 	}
 
 	usersAndworkspacesRes, err := database.DBCon.Exec(`insert into users_workspaces (user_id, workspace_id) values ($1, $2)`, userID, workspaceID)
 	if err != nil {
-		responses.ERROR(w, http.StatusConflict, errors.New("Cannot insert duplicate data into users_workspaces"))
+		responses.ERROR(w, http.StatusConflict, errors.New("DUPLICATE_DATA_USERS_WORKSPACES"))
 		return
 	}
 	numOfRowsInserted, err = usersAndworkspacesRes.RowsAffected()
 	if err != nil {
-		responses.ERROR(w, http.StatusConflict, errors.New("RowsAffected throwed an error"))
+		responses.ERROR(w, http.StatusConflict, errors.New("ERROR_ROWS_AFFECTED"))
 		return
 	}
 	fmt.Printf("Number of rows inserted in 'users_workspaces' table : %v \n", numOfRowsInserted)
